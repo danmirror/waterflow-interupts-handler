@@ -8,12 +8,12 @@
  */
 #include <Wire.h> /*master slave*/
 
-#define flowSensor_pin1 4
+#define flowSensor_pin1 2
 #define flowSensor_pin2 8
 #define flowSensor_pin3 A0
-//#define relay1  3
-//#define relay2  4
-//#define relay3  5
+#define relay1  3
+#define relay2  4
+#define relay3  5
 
 byte sensorInt1 = 0;
 byte sensorInt2 = 0;
@@ -44,7 +44,7 @@ int data = 0;
 
 /*inisial master slave data*/
 String container="";
-String send_to_master="";
+char send_to_master[3]="";
 
 
 void pciSetup(byte pin)
@@ -79,7 +79,6 @@ ISR (PCINT1_vect) // handle pin change interrupt for A0 to A5 here
  }  
 ISR (PCINT2_vect) // handle pin change interrupt for D0 to D7 here
  {
-//         digitalWrite(13,digitalRead(7));/
     bool read_2 = digitalRead(2);
    
     if( read_2 == false)
@@ -92,9 +91,9 @@ ISR (PCINT2_vect) // handle pin change interrupt for D0 to D7 here
  
 void setup() {  
   Serial.begin(9600);
-//  pinMode(relay1, OUTPUT);
-//  pinMode(relay2, OUTPUT);
-//  pinMode(relay3, OUTPUT);
+  pinMode(relay1, OUTPUT);
+  pinMode(relay2, OUTPUT);
+  pinMode(relay3, OUTPUT);
   
   // set pullups, if necessary
   digitalWrite(flowSensor_pin1, HIGH);
@@ -128,10 +127,7 @@ void loop() {
       total_volume1 += flow_mlt1;
       total_volume2 += flow_mlt2;
       total_volume3 += flow_mlt3;
-      send_to_master="Debit 1:"+(String)debit_air1+"L/min"+ "V 1 :"+(String)total_volume1+"mL"+
-                      "Debit 2:"+(String)debit_air2+"L/min"+ "V 2 :"+(String)total_volume2+"mL"+
-                      "Debit 3:"+(String)debit_air3+"L/min"+ "V 3 :"+(String)total_volume3+"mL";
-                      
+      
               
       Serial.print("Debit air1: ");  Serial.print(int(debit_air1));   Serial.print(" L/min");
       Serial.print("\t Volume air1: "); Serial.print(total_volume1);     Serial.println(" mL");
@@ -146,18 +142,46 @@ void loop() {
       count2 = 0;
       count3 = 0;
   }
-  delay(100);
-  
+  delay(500);
+
+  /*adjusting*/
   Serial.println(container);
-  
-//  digitalWrite(relay1, HIGH);
-//  digitalWrite(relay2, HIGH);
-//  digitalWrite(relay3, HIGH); 
-//  
-//  digitalWrite(relay1, LOW);
-//  digitalWrite(relay2, LOW);
-//  digitalWrite(relay3, LOW);
-  
+  if(container == "11"){
+    digitalWrite(relay1, HIGH);
+  }
+  else if(container == "10"){
+    digitalWrite(relay1, LOW);
+  }
+  else if(container == "21"){
+    digitalWrite(relay1, HIGH);
+  }
+  else if(container == "20"){
+    digitalWrite(relay1, LOW);
+  }
+  else if(container == "31"){
+    digitalWrite(relay1, HIGH);
+  }
+  else if(container == "30"){
+    digitalWrite(relay1, LOW);
+  }
+  else if(container == "d1"){
+    dtostrf(debit_air1,3, 3, send_to_master);
+  }
+  else if(container == "d2"){
+    dtostrf(debit_air1,3, 3, send_to_master);
+  }
+  else if(container == "d3"){
+    dtostrf(debit_air3,3, 3, send_to_master);
+  }
+  else if(container == "v1"){
+    dtostrf(total_volume1,3, 3, send_to_master);
+  }
+  else if(container == "v"){
+    dtostrf(total_volume2,3, 3, send_to_master);
+  }
+  else if(container == "v3"){
+   dtostrf(total_volume3,3, 3, send_to_master);
+  }
 }
 
 // function that executes whenever data is received from master
@@ -174,7 +198,6 @@ void receiveEvent(int howMany) {
 
 // function that executes whenever data is requested from master
 void requestEvent() {
-  char *msg = "sensor data";
 //  strcat( msg, send_to_master.c_str() );/
- Wire.write(msg);  
+  Wire.write(send_to_master);  
 }

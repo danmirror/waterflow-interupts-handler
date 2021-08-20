@@ -13,8 +13,8 @@
  
 CTBot myBot;
  
-String ssid  = "sasino"  ; // ssid wifi anda
-String pass  = "1234lima"; // password wifi anda
+String ssid  = "dann"  ; // ssid wifi anda
+String pass  = "danu12345"; // password wifi anda
 String token = "1652016015:AAFvl924BYzMzQGol7CcFlCZIhlJnyHKYEw";
 String container = "";
 char* data_to_slave = "";
@@ -35,7 +35,7 @@ void setup() {
   else
     Serial.println("\ntestConnection bad");
     
-  /*slave */
+  /* master initial */
   Wire.begin(D1, D2);             // join i2c bus with address #4
 
 
@@ -44,10 +44,10 @@ void setup() {
 void loop() {
 
   /* 
-   *  slave
+   *  Master
    */
    
-  slave();
+  master();
   
   // a variable to store telegram message data
   TBMessage msg;
@@ -79,27 +79,47 @@ void loop() {
           data_to_slave = "30";       
          myBot.sendMessage(msg.sender.id, "pump 3 off"); 
       }
-      else if (msg.text.equalsIgnoreCase("status")) {        
+      else if (msg.text.equalsIgnoreCase("Debit 1")) {   
+          data_to_slave = "d1";      
+         myBot.sendMessage(msg.sender.id, container); 
+      }
+      else if (msg.text.equalsIgnoreCase("Debit 2")) {   
+          data_to_slave = "d2";      
+         myBot.sendMessage(msg.sender.id, container); 
+      }
+      else if (msg.text.equalsIgnoreCase("Debit 3")) {   
+          data_to_slave = "d3";      
+         myBot.sendMessage(msg.sender.id, container); 
+      }
+      else if (msg.text.equalsIgnoreCase("Volume 1")) {   
+          data_to_slave = "v1";      
+         myBot.sendMessage(msg.sender.id, container); 
+      }
+      else if (msg.text.equalsIgnoreCase("Volume 2")) {   
+          data_to_slave = "v2";      
+         myBot.sendMessage(msg.sender.id, container); 
+      }
+      else if (msg.text.equalsIgnoreCase("Volume 3")) {   
+          data_to_slave = "v3";      
          myBot.sendMessage(msg.sender.id, container); 
       }
       else {                                                   
           // generate the message for the sender
           String reply;
-          reply = (String)"Welcome " + msg.sender.username + (String)". ketik p1 on / p1 off / status.";
+          reply = (String)"Welcome " + msg.sender.username + (String)". ketik P1 on / P1 off / Debit 1/ Debit 2/ Debit 3 / Volume 1/ Volume 2 / Volume 3.";
           myBot.sendMessage(msg.sender.id, reply);             // and send it
       }
   }
-  // wait 500 milliseconds
-  delay(500);
+  delay(1000);
 }
-void slave()
+void master()
 {
    String staging = "";
    Wire.beginTransmission(8);   /* begin with device address 8 */
    Wire.write(data_to_slave);   /* sends to slave */
    Wire.endTransmission();      /* stop transmitting */
   
-   Wire.requestFrom(8, 13);     /* request & read data of size 13 from slave */
+   Wire.requestFrom(8, 3);     /* request & read data of size 13 from slave */
    while(Wire.available()){
       char c = Wire.read();
     Serial.print(c);
