@@ -58,34 +58,34 @@ void pciSetup(byte pin)
   
 ISR (PCINT0_vect) // handle pin change interrupt for D8 to D13 here
  {    
-    bool read_8 = digitalRead(8);
+    bool read_8 = digitalRead(flowSensor_pin2);
     if( read_8 == false)
     {
-      count1++;
+      count2++;
       Serial.print("pin 8 > ");
-      Serial.println(count1);
+      Serial.println(count2);
     }
  }
  
 ISR (PCINT1_vect) // handle pin change interrupt for A0 to A5 here
  {
-    bool read_A0= digitalRead(A0);
+    bool read_A0= digitalRead(flowSensor_pin3);
     if( read_A0 == false)
     {
-      count2++;
+      count3++;
       Serial.print("pin A0 > ");
-      Serial.println(count2);
+      Serial.println(count3);
     }
  }  
 ISR (PCINT2_vect) // handle pin change interrupt for D0 to D7 here
  {
-    bool read_2 = digitalRead(2);
+    bool read_2 = digitalRead(flowSensor_pin1);
    
     if( read_2 == false)
     {
-      count3++;
+      count1++;
       Serial.print("pin 2 >");
-      Serial.println(count3);
+      Serial.println(count1);
     }
  }  
  
@@ -101,9 +101,9 @@ void setup() {
   digitalWrite(flowSensor_pin3, HIGH);
   
   // enable interrupt for pin...
-  pciSetup(2);
-  pciSetup(8);
-  pciSetup(A0);
+  pciSetup(flowSensor_pin1);
+  pciSetup(flowSensor_pin2);
+  pciSetup(flowSensor_pin3);
   
   /*---------------- slave setup-----------------------*/
   Wire.begin(8);                /* join i2c bus with address 8 */
