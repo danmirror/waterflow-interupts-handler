@@ -135,11 +135,11 @@ void loop() {
   
   if ((millis() - oldTime) > 1000) {
 
-      staging1 += ((1000.0 / (millis() - oldTime)) * count1) / konst1;
-      staging2 += ((1000.0 / (millis() - oldTime)) * count2) / konst2;
+      staging1 = ((1000.0 / (millis() - oldTime)) * count1) / konst1;
+      staging2 = ((1000.0 / (millis() - oldTime)) * count2) / konst2;
 
-      debit_air1 = staging1;
-      debit_air2 = staging2;
+      debit_air1 += staging1;
+      debit_air2 += staging2;
       
       oldTime = millis();
       flow_mlt1 = (staging1 / 60) * 1000;
