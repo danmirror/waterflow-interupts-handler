@@ -1,11 +1,10 @@
-
 /*
  * Danmirror 
  * telegram
  * master slave D1 D2
  * 
  * 2021 
- * 
+ *  note : not using number 3
  */
 
 #include "CTBot.h"
@@ -23,7 +22,7 @@ void setup() {
   // initialize the Serial
   Serial.begin(115200);
   Serial.println("IoT Telegram kendali LED");
-  // connect the ESP8266 to the desired access point
+///   connect the ESP8266 to the desired access point
   myBot.wifiConnect(ssid, pass);
   
   // set the telegram bot token
@@ -71,45 +70,58 @@ void loop() {
           data_to_slave = "20";        
           myBot.sendMessage(msg.sender.id, "pump 2 off"); 
       }
-      else if (msg.text.equalsIgnoreCase("P3 on")) {    
-          data_to_slave = "31";    
-          myBot.sendMessage(msg.sender.id, "pump 3 on"); 
-      }
+//      else if (msg.text.equalsIgnoreCase("P3 on")) {    
+//          data_to_slave = "31";    
+//          myBot.sendMessage(msg.sender.id, "pump 3 on"); 
+//      }
       else if (msg.text.equalsIgnoreCase("P3 off")) { 
           data_to_slave = "30";       
          myBot.sendMessage(msg.sender.id, "pump 3 off"); 
       }
       else if (msg.text.equalsIgnoreCase("Debit 1")) {   
           data_to_slave = "d1";      
-         myBot.sendMessage(msg.sender.id, container); 
+         myBot.sendMessage(msg.sender.id, "Debit 1 => "+container); 
       }
       else if (msg.text.equalsIgnoreCase("Debit 2")) {   
           data_to_slave = "d2";      
-         myBot.sendMessage(msg.sender.id, container); 
+         myBot.sendMessage(msg.sender.id, "Debit 2 => "+container); 
       }
-      else if (msg.text.equalsIgnoreCase("Debit 3")) {   
-          data_to_slave = "d3";      
-         myBot.sendMessage(msg.sender.id, container); 
-      }
+//      else if (msg.text.equalsIgnoreCase("Debit 3")) {   
+//          data_to_slave = "d3";      
+//         myBot.sendMessage(msg.sender.id, "Debit 3 => " +container); 
+//      }
       else if (msg.text.equalsIgnoreCase("Volume 1")) {   
           data_to_slave = "v1";      
-         myBot.sendMessage(msg.sender.id, container); 
+         myBot.sendMessage(msg.sender.id, "Volume 1 => " +container); 
       }
       else if (msg.text.equalsIgnoreCase("Volume 2")) {   
           data_to_slave = "v2";      
-         myBot.sendMessage(msg.sender.id, container); 
+         myBot.sendMessage(msg.sender.id, "Volume 2 => " +container); 
       }
-      else if (msg.text.equalsIgnoreCase("Volume 3")) {   
-          data_to_slave = "v3";      
-         myBot.sendMessage(msg.sender.id, container); 
+//      else if (msg.text.equalsIgnoreCase("Volume 3")) {   
+//          data_to_slave = "v3";      
+//         myBot.sendMessage(msg.sender.id, "Volume 3 => " +container); 
+//      }
+
+      else if (msg.text.equalsIgnoreCase("Biaya 1")) {   
+        data_to_slave = "v1";      
+         myBot.sendMessage(msg.sender.id, "Biaya 1 => " +container*price); 
       }
+      else if (msg.text.equalsIgnoreCase("Biaya 2")) {   
+          data_to_slave = "v2";      
+         myBot.sendMessage(msg.sender.id, "Biaya 1 => " +container*price); 
+      }
+   
+      
       else {                                                   
           // generate the message for the sender
           String reply;
-          reply = (String)"Welcome " + msg.sender.username + (String)". ketik P1 on / P1 off / Debit 1/ Debit 2/ Debit 3 / Volume 1/ Volume 2 / Volume 3.";
+          reply = (String)"Welcome " + msg.sender.username + (String)". ketik P1 on / P1 off / Debit 1/ Debit 2/ "
+                                                          +"/ Volume 1/ Volume 2 / Harga 1 Harga 2";
           myBot.sendMessage(msg.sender.id, reply);             // and send it
       }
   }
+  //data_to_slave = "v1";
   delay(1000);
 }
 void master()
@@ -119,11 +131,16 @@ void master()
    Wire.write(data_to_slave);   /* sends to slave */
    Wire.endTransmission();      /* stop transmitting */
   
-   Wire.requestFrom(8, 3);     /* request & read data of size 13 from slave */
-   while(Wire.available()){
+   Wire.requestFrom(8, 5);     /* request & read data of size 13 from slave */
+   while(Wire.available())
+   {
       char c = Wire.read();
-    Serial.print(c);
-    staging +=c;
+
+      if(c>= 97 && c <=  122 || c>= 65 && c <=  90  || c>= 48 && c <=  57)
+      {
+        Serial.print(c);
+        staging +=c;
+      }
    }
    Serial.println();
    container = staging;
